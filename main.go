@@ -19,6 +19,7 @@ func main() {
 }
 
 func convertToThaiBath(amount decimal.Decimal) string {
+	amount = amount.Round(2)
 	intPart := amount.Truncate(0)
 	decimalValue := amount.Sub(intPart)
 
@@ -78,7 +79,7 @@ func convertSixDigitChunk(n int64) string {
 		return ""
 	}
 
-	s := fmt.Sprintf("%0*d", 6, n)
+	s := strconv.FormatInt(n, 10)
 	length := len(s)
 	chunkResult := ""
 
@@ -87,23 +88,34 @@ func convertSixDigitChunk(n int64) string {
 		digit := int(digitChar - '0')
 		pos := length - 1 - i
 
-		if digit == 0 {
+		if digit == 0 && pos != 0 {
+			continue
+		}
+
+		if digit == 0 && pos == 0 {
 			continue
 		}
 
 		numText := thaiNums[digit]
 		unitText := thaiUnits[pos]
 
-		if pos == 0 && digit == 1 && length > 1 {
-			numText = "เอ็ด"
+		if pos == 0 && digit == 1 {
+			if length > 1 {
+				if length >= 2 && s[length-2] == '1' {
+					numText = "เอ็ด"
+				} else {
+					numText = "เอ็ด"
+				}
+			}
 		}
+
 		if pos == 1 && digit == 2 {
 			numText = "ยี่"
 		}
+
 		if pos == 1 && digit == 1 {
 			numText = ""
 		}
-
 		chunkResult += numText + unitText
 	}
 	return chunkResult
